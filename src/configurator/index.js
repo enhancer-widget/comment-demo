@@ -26,12 +26,15 @@ const configurator = {
     $('body').html(tplHTML);
 
     $('input[name=enableAddComment]').on('change', function () {
-      $('input[name=addCommentCondition], input[name=maxCommentLength]')
+      $('input[name=addCommentCondition], input[name=maxCommentLength], input[name=showAddBtn]')
       .closest('tr').toggle(this.checked);
     });
+
+    this.initDataSource();
   },
 
   initDataSource() {
+    // 通过 配置页面 -> 数据源设置 -> 点击查看组件要求的数据格式说明, 查看 dataSpecification 的内容 
     const dataSpecification = `{
       "rows": [
         {
@@ -39,19 +42,15 @@ const configurator = {
         }
       ]
     }`;
+
+    // 初始化数据源配置器
     this.dataSourceConfig = Enhancer.DatasourceManager.createConfigurator('dataSourceDom', {
       supportedTypes: ['rdb', 'http', 'static', 'jsonp'],
       dataSpecification: dataSpecification, // 组件数据格式说明 
-      onSave: (source) => {
+      onSave: (source) => { // 当用户点击 保存数据源 按钮时会调用 onSave 方法 
         this.profile.dataSourceId = source.id;
       }
     });
-
-    if (this.profile.dataSourceId) {
-      Enhancer.DatasourceManager.getDatasource(this.profile.dataSourceId, (source) => {
-        this.dataSourceConfig.setConfig(source);
-      });
-    }
   },
   /**
    * @setProfile {Function} [required] Will be called when user decides to  
@@ -60,11 +59,20 @@ const configurator = {
    */
   setProfile(profile) {
     this.profile = profile || {};
-    this.initDataSource();
+
+    if (this.profile.dataSourceId) {
+      Enhancer.DatasourceManager.getDatasource(this.profile.dataSourceId, (source) => {
+        this.dataSourceConfig.setConfig(source);
+      });
+    }
 
     $('input[name=commentListTitle]').val(profile.commentListTitle || '');
     if (profile.enableAddComment) {
       $('input[name=enableAddComment]').click();
+    }
+
+    if (profile.showAddBtn) {
+      $('input[name=showAddBtn]').prop('checked', true);
     }
 
     $('input[name=addCommentCondition]').val(profile.addCommentCondition || '');
@@ -88,7 +96,8 @@ const configurator = {
       commentListTitle: $('input[name=commentListTitle]').val(),
       enableAddComment: $('input[name=enableAddComment]').prop('checked'),
       addCommentCondition: $('input[name=addCommentCondition]').val(),
-      maxCommentLength: $('input[name=maxCommentLength]').val()
+      maxCommentLength: $('input[name=maxCommentLength]').val(),
+      showAddBtn: $('input[name=showAddBtn]').prop('checked')
     };
   },
   /**
@@ -102,11 +111,15 @@ const configurator = {
    * @return {Array<Object>} EventList
    */
   getSupportedEventList(profile) {
-    return [{
-      id: "onAddComment",
-      name: "On Add Comment",
-      des: "Triggered when user post a new comment"
-    }];
+    const list = [];
+    if (profile.showAddBtn) {
+      list.push({
+        id: "onAddComment",
+        name: locale('addComment'),
+        des: "Triggered when user post a new comment"
+      });
+    }
+    return list;
   },
   /**
    * @getSupportedVariableList {Function} [optional] This method will be called if

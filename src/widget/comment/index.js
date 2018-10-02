@@ -5,14 +5,9 @@ import './index.less';
 import locale from '../i18n';
 
 
-const defaultProps = {
-  onAddComment() {
-  }
-}
-
 export default class EnhancerComment {
   constructor(props, container) {
-    this.props = $.extend(true, {}, defaultProps, props);
+    this.props = props;
     this.container = $(container);
     this.render();
   }
@@ -23,7 +18,15 @@ export default class EnhancerComment {
     this.container.find('.comment-list-wrap').hide();
     this.container.find('.comment-loading').show();
 
-    this.props.loadPage(page, 10, (data) => {
+    const parent = this.props.parent;
+    const dataSourceId = this.props.dataSourceId;
+
+    parent.getSourceData(dataSourceId, {
+      page: page,
+      rowNum: 10,
+      countRecords: true,
+      paged: true
+    }, (data) => {
       if (Array.isArray(data)) {
         data = {
           rows: data
@@ -54,14 +57,22 @@ export default class EnhancerComment {
   }
 
   handleComment(data, value, e) {
-    this.props.onComment('onAddComment', {
+    const parent = this.props.parent;
+    parent.onComment('onAddComment', {
       content: value,
     }, () => {
     });
   }
 
   isValid() {
-    return this.commentBox ? this.commentBox.isValid() : true;
+    const content = this.commentBox.getContent();
+    return content.length <= this.props.commentMaxLength;
+  }
+
+  getData() {
+    return {
+      content: this.commentBox.getContent()
+    };
   }
   
   renderList() {
@@ -160,6 +171,9 @@ export default class EnhancerComment {
 
     this.confirmBox && this.confirmBox.dialog('destroy').remove();
     this.confirmBox = null;
+
+    this.props.parent = null;
+    this.props = null;
   }
 
   renderChildren() {

@@ -5,5 +5,7 @@ module.exports = {
   commentListTitle: '评论列表标题',
   enableComment: '启用评论功能',
   commentCondition: '评论功能生效条件',
-  maxComment: '评论内容最大长度'
+  maxComment: '评论内容最大长度',
+  addComment: '添加评论',
+  showAddBtn: '显示添加评论按钮'
 };

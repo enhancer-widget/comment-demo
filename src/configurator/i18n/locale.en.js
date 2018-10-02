@@ -5,5 +5,7 @@ module.exports = {
   commentListTitle: 'title',
   enableComment: 'enable comment',
   commentCondition: 'condition',
-  maxComment: 'max length'
+  maxComment: 'max length',
+  addComment: 'add comment',
+  showAddBtn: 'show add btn'
 };
