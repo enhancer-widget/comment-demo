@@ -2,14 +2,14 @@ import './commentBox.less';
 import locale from '../i18n';
 
 const defaultProps = {
-  commentMaxLength: 500,
+  maxCommentLength: 500,
   onComment() {},
 }
 
 export default class CommentBox {
   constructor(props, container) {
     this.props = $.extend(true, {}, defaultProps, props);
-    this.props.commentMaxLengthTip = locale('commentMaxLengthTip', {max: this.props.commentMaxLength})
+    this.props.commentMaxLengthTip = locale('commentMaxLengthTip', {max: this.props.maxCommentLength})
     this.container = $(container);
     this.render();
   }
@@ -20,7 +20,7 @@ export default class CommentBox {
   
   handleComment(e) {
     const value = this.getContent();
-    if (value.length > this.props.commentMaxLength) {
+    if (value.length > this.props.maxCommentLength) {
       this.container.find('.comment-input').addClass('ui-state-error');
       this.container.find('.comment-input-tip').text(this.props.commentMaxLengthTip).show();
     } else if (value) {
@@ -49,7 +49,7 @@ export default class CommentBox {
       const count = $(e.target).val().trim().length;
       const counter = this.container.find('.comment-current-count');
       counter.text(count);
-      counter.toggleClass('error', count > this.props.commentMaxLength)
+      counter.toggleClass('error', count > this.props.maxCommentLength)
     });
   }
 
@@ -72,7 +72,7 @@ export default class CommentBox {
       <div class="comment-input-wrap" style="position: relative;">
         <textarea class="comment-input ui-widget-content" placeholder="${locale('commentPlaceholder')}" rows="4" ></textarea>
         <div class="comment-input-tip" style="display: none;"></div>
-        <div class="comment-counter"><span class="comment-current-count">0</span> / ${this.props.commentMaxLength}</div>
+        <div class="comment-counter"><span class="comment-current-count">0</span> / ${this.props.maxCommentLength}</div>
       </div>
       ${btn}
     </div>`;

@@ -66,12 +66,12 @@ export default class EnhancerComment {
 
   isValid() {
     const content = this.commentBox.getContent();
-    return content.length <= this.props.commentMaxLength;
+    return content.length <= this.props.maxCommentLength;
   }
 
   getData() {
     return {
-      content: this.commentBox.getContent()
+      content: this.commentBox ? this.commentBox.getContent() : ''
     };
   }
   
